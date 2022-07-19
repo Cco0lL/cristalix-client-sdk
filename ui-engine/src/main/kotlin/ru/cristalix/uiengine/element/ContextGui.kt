@@ -6,6 +6,7 @@ import ru.cristalix.uiengine.ClickEvent
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.MouseButton
 import ru.cristalix.uiengine.utility.V3
+import ru.cristalix.uiengine.utility.updateResolution
 
 inline fun safe(action: () -> Unit) {
     try {
@@ -49,9 +50,16 @@ open class ContextGui(builder: Screen.Builder = Screen.Builder.builder()) : Cont
         }
         .build()
 
-    fun open() = UIEngine.clientApi.minecraft().displayScreen(screen)
+    fun open() {
+        updateResolution()
+        UIEngine.currentContextGui = this
+        UIEngine.clientApi.minecraft().displayScreen(screen)
+    }
 
-    fun close() = UIEngine.clientApi.minecraft().displayScreen(null)
+    fun close() {
+        UIEngine.currentContextGui = null
+        UIEngine.clientApi.minecraft().displayScreen(null)
+    }
 
     fun onKeyTyped(action: (char: Char, code: Int) -> Unit) =
         keyTypedHandlers.add(action)

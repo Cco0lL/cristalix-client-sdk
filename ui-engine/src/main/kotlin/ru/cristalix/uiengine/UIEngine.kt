@@ -13,7 +13,9 @@ import ru.cristalix.uiengine.element.*
 import ru.cristalix.uiengine.eventloop.EventLoop
 import ru.cristalix.uiengine.eventloop.EventLoopImpl
 import ru.cristalix.uiengine.utility.MouseButton
+import ru.cristalix.uiengine.utility.Resolution
 import ru.cristalix.uiengine.utility.V3
+import ru.cristalix.uiengine.utility.updateResolution
 import java.nio.FloatBuffer
 import kotlin.properties.Delegates.notNull
 
@@ -54,6 +56,9 @@ object UIEngine : EventLoop by EventLoopImpl() {
      */
     @JvmField
     val worldContexts: MutableList<Context3D> = ArrayList()
+
+    var currentContextGui: ContextGui? = null
+        internal set
 
     private var lastMouseState: BooleanArray = booleanArrayOf(false, false, false)
 
@@ -102,6 +107,8 @@ object UIEngine : EventLoop by EventLoopImpl() {
         val resolution = clientApi.resolution()
         overlayContext.size = V3(resolution.scaledWidth_double, resolution.scaledHeight_double)
         postOverlayContext.size = V3(resolution.scaledWidth_double, resolution.scaledHeight_double)
+        Resolution.updateResolution()
+        currentContextGui?.updateResolution()
     }
 
     private fun renderOverlay() {
