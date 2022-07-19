@@ -269,6 +269,11 @@ abstract class AbstractElement() : IElement {
             }
         }
 
+        //this hasn't been safe for hover detection
+        if (mouseMatrix.m22 == 0f) {
+            mouseMatrix.m22 = 1f
+        }
+
         val hoverPosition = hoverPosition
         if (Matrix4f.invert(mouseMatrix, invertedMouseMatrix) == null) {
             hoverPosition.x = 0.0
