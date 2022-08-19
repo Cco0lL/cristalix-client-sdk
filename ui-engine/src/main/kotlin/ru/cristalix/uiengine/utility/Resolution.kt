@@ -61,5 +61,5 @@ fun ContextGui.updateResolution() {
     root.align = CENTER
 
     val scale = Resolution.ScaleFactor
-    root.scale = V3(scale, scale)
+    root.scale = V3(scale, scale, 1.0)
 }
