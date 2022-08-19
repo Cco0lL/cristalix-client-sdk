@@ -49,6 +49,9 @@ open class RectangleElement : AbstractElement(), Parent {
     var mask: Boolean = false
 
     @JvmField
+    var colorMask: Boolean = true
+
+    @JvmField
     var layering: Boolean = false
 
     override val children: MutableList<AbstractElement> = ArrayList()
@@ -123,14 +126,30 @@ open class RectangleElement : AbstractElement(), Parent {
         super.updateHoverState(mouseMatrix, mouseVector)
 
         val children = children
-        if (children.isEmpty()) return
+        if (children.isEmpty()) {
+            return
+        }
 
-        for (child in children) {
-            if (!child.interactive) continue
+        if (hovered) {
+            for (child in children) {
+                if (!child.interactive) {
+                    continue
+                }
 
-            val matrix = Matrix4f()
-            matrix.load(mouseMatrix)
-            child.updateHoverState(matrix, mouseVector)
+                val matrix = Matrix4f()
+                matrix.load(mouseMatrix)
+                child.updateHoverState(matrix, mouseVector)
+            }
+        } else if (mask) {
+            for (child in children) {
+                if (!child.hovered) {
+                    continue
+                }
+
+                child.hovered = false
+                val onHover = child.onHover
+                onHover?.invoke(child)
+            }
         }
     }
 
@@ -192,13 +211,20 @@ open class RectangleElement : AbstractElement(), Parent {
         GlStateManager.enableBlend()
 
         val mask = mask
+        val colorMask = colorMask
+
         val properties = properties
 
         val children = children
         val childrenAmount = children.size
+
         if (mask) {
             GlStateManager.enableDepth()
             GlStateManager.translate(0f, 0f, 0.97f)
+        }
+
+        if (!colorMask) {
+            GlStateManager.colorMask(false, false, false, false)
         }
 
         val color = color
@@ -207,7 +233,7 @@ open class RectangleElement : AbstractElement(), Parent {
             depth++
         }
 
-        if (color.alpha > 0 || mask) {
+        if (color.alpha > 0 || colorMask) {
             val textureLocation = textureLocation
             if (textureLocation != null) {
                 api.renderEngine().bindTexture(textureLocation)
@@ -283,11 +309,14 @@ open class RectangleElement : AbstractElement(), Parent {
             GlStateManager.disableBlend()
         }
 
+        if (!colorMask) {
+            GlStateManager.colorMask(true, true, true, true)
+        }
+
         if (childrenAmount > 0) {
             if (mask) {
-//                GlStateManager.translate(0f, 0f, -1f)
-                GlStateManager.depthFunc(GL11.GL_EQUAL)
                 GlStateManager.depthMask(false)
+                GlStateManager.depthFunc(GL11.GL_GEQUAL)
             }
             val offset = 1.02f / (childrenAmount + 1)
             for (child in children) {
