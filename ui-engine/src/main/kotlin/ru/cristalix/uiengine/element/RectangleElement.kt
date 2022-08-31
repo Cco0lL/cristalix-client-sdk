@@ -126,30 +126,14 @@ open class RectangleElement : AbstractElement(), Parent {
         super.updateHoverState(mouseMatrix, mouseVector)
 
         val children = children
-        if (children.isEmpty()) {
-            return
-        }
+        if (children.isEmpty()) return
 
-        if (hovered) {
-            for (child in children) {
-                if (!child.interactive) {
-                    continue
-                }
+        for (child in children) {
+            if (!child.interactive) continue
 
-                val matrix = Matrix4f()
-                matrix.load(mouseMatrix)
-                child.updateHoverState(matrix, mouseVector)
-            }
-        } else if (mask) {
-            for (child in children) {
-                if (!child.hovered) {
-                    continue
-                }
-
-                child.hovered = false
-                val onHover = child.onHover
-                onHover?.invoke(child)
-            }
+            val matrix = Matrix4f()
+            matrix.load(mouseMatrix)
+            child.updateHoverState(matrix, mouseVector)
         }
     }
 
@@ -260,7 +244,7 @@ open class RectangleElement : AbstractElement(), Parent {
                 val worldrenderer: BufferBuilder = tessellator.bufferBuilder
                 GlStateManager.enableBlend()
                 GlStateManager.disableTexture2D()
-                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+                GlStateManager.tryBlendFuncSeparate(770, 771, 0, 1)
 
                 GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha.toFloat())
 
