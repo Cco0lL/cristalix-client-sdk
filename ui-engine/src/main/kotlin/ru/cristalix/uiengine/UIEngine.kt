@@ -109,6 +109,8 @@ object UIEngine : EventLoop by EventLoopImpl() {
         postOverlayContext.size = V3(resolution.scaledWidth_double, resolution.scaledHeight_double)
         Resolution.updateResolution()
         currentContextGui?.updateResolution()
+        postOverlayContext.updateResolution()
+        overlayContext.updateResolution()
     }
 
     private fun renderOverlay() {

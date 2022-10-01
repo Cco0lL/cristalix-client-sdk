@@ -62,10 +62,12 @@ import ru.cristalix.uiengine.utility.translate
 abstract class AbstractElement() : IElement {
     @JvmField
     val properties: DoubleArray = DoubleArray(Property.VALUES.size)
+
     @JvmField
     val matrices: Array<Matrix4f?> = arrayOfNulls(matrixFields)
 
     private var dirtyMatrices = BooleanArray(MATRIX_COUNT)
+
     @JvmField
     protected var cachedHexColor: Int = 0
 
@@ -118,10 +120,13 @@ abstract class AbstractElement() : IElement {
 
     @JvmField
     var enabled: Boolean = true
+
     @JvmField
     var onClick: ClickHandler? = null
+
     @JvmField
     var onHover: HoverHandler? = null
+
     @JvmField
     var lastParent: AbstractElement? = null
 
@@ -364,7 +369,7 @@ abstract class AbstractElement() : IElement {
                     properties[OffsetZ]
                 )
 
-                scaleMatrix -> matrix.scale(
+                scaleMatrix -> if (this !is Context2D) matrix.scale(
                     properties[ScaleX],
                     properties[ScaleY],
                     properties[ScaleZ]
@@ -416,11 +421,22 @@ abstract class AbstractElement() : IElement {
         )
 
         val matrixBuffer = matrixBuffer
-        for (matrix in this.matrices) {
-            if (matrix == null) continue
+        matrices.forEachIndexed { index, matrix ->
+            if (matrix == null) return@forEachIndexed
+
             matrix.store(matrixBuffer)
             matrixBuffer.flip()
             GlStateManager.multMatrix(matrixBuffer)
+
+            if (index == scaleMatrix) {
+                lastParent?.run {
+                    if (this is Context2D) GlStateManager.scale(
+                        this.properties[ScaleX],
+                        this.properties[ScaleY],
+                        this.properties[ScaleZ],
+                    )
+                }
+            }
         }
     }
 

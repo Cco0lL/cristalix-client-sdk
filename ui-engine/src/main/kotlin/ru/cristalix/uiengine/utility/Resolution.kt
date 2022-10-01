@@ -2,7 +2,7 @@ package ru.cristalix.uiengine.utility
 
 import org.lwjgl.opengl.Display
 import ru.cristalix.uiengine.UIEngine
-import ru.cristalix.uiengine.element.ContextGui
+import ru.cristalix.uiengine.element.Context2D
 
 /**
  * Doesn't work for overlay and post overlay
@@ -51,15 +51,8 @@ object Resolution {
     }
 }
 
-fun ContextGui.updateResolution() {
-    if (!Resolution.enabled) {
-        return
-    }
-
-    val root = children.firstOrNull() ?: return
-    root.origin = CENTER
-    root.align = CENTER
-
+fun Context2D.updateResolution() {
+    if (!Resolution.enabled) return
     val scale = Resolution.ScaleFactor
-    root.scale = V3(scale, scale, 1.0)
+    this.scale = V3(scale, scale, 1.0)
 }
