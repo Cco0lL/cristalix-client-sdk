@@ -2,11 +2,11 @@ package ru.cristalix.uiengine.utility
 
 import org.lwjgl.opengl.Display
 import ru.cristalix.uiengine.UIEngine
+import ru.cristalix.uiengine.UIEngine.overlayContext
+import ru.cristalix.uiengine.element.AbstractElement
 import ru.cristalix.uiengine.element.Context2D
+import ru.cristalix.uiengine.element.ContextGui
 
-/**
- * Doesn't work for overlay and post overlay
- */
 object Resolution {
 
     var enabled = false
@@ -25,17 +25,23 @@ object Resolution {
     var ScaleFactor = 0.0
         private set
 
-    fun initialize(devWidth: Int = 1920, devHeight: Int = 1280) {
+    /**
+     * that's need for preserving the proportions of existing code, just set the value to 1.5
+     */
+    var McScaleDouble = 1.0
+        private set
+
+    fun initialize(devWidth: Int = 1920, devHeight: Int = 1280, mcScale: Double = 1.0) {
         DevWidthDouble = devWidth.toDouble()
         DevHeightDouble = devHeight.toDouble()
+        McScaleDouble = mcScale
         enabled = true
         updateResolution()
     }
 
     internal fun updateResolution() {
-        if (!enabled) {
-            return
-        }
+        if (!enabled) return
+
         val api = UIEngine.clientApi
         val mc = api.minecraft()
         val clientResolution = UIEngine.clientApi.resolution()
@@ -47,12 +53,25 @@ object Resolution {
         val devAndPlayerProportion =
             (InitialHeightDouble + InitialWidthDouble) / (DevWidthDouble + DevHeightDouble)
         ScaleFactor =
-            ((widthScale + heightScale) / (2.0 * scale)) * devAndPlayerProportion
+            ((widthScale + heightScale) / (2.0 * scale)) * McScaleDouble * devAndPlayerProportion
+
+        overlayContext.updateResolution()
+//        postOverlayContext.updateResolution()
+    }
+
+    fun resolutionScale(lastParent: AbstractElement?): Double {
+        var resolutionScale = 1.0
+        lastParent?.let {
+            if (enabled && (it is ContextGui || it == overlayContext)) resolutionScale = ScaleFactor
+        }
+        return resolutionScale
     }
 }
 
 fun Context2D.updateResolution() {
     if (!Resolution.enabled) return
-    val scale = Resolution.ScaleFactor
-    this.scale = V3(scale, scale, 1.0)
+    for (child in children) {
+        child.markDirty(scaleMatrix)
+        child.markDirty(offsetMatrix)
+    }
 }

@@ -8,11 +8,7 @@ import ru.cristalix.uiengine.HoverHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.UIEngine.matrixBuffer
 import ru.cristalix.uiengine.eventloop.Animation
-import ru.cristalix.uiengine.utility.Color
-import ru.cristalix.uiengine.utility.MATRIX_COUNT
-import ru.cristalix.uiengine.utility.MATRIX_OFFSET
-import ru.cristalix.uiengine.utility.MouseButton
-import ru.cristalix.uiengine.utility.Property
+import ru.cristalix.uiengine.utility.*
 import ru.cristalix.uiengine.utility.Property.AlignX
 import ru.cristalix.uiengine.utility.Property.AlignY
 import ru.cristalix.uiengine.utility.Property.AlignZ
@@ -39,24 +35,6 @@ import ru.cristalix.uiengine.utility.Property.ScaleZ
 import ru.cristalix.uiengine.utility.Property.SizeX
 import ru.cristalix.uiengine.utility.Property.SizeY
 import ru.cristalix.uiengine.utility.Property.SizeZ
-import ru.cristalix.uiengine.utility.ProxiedColor
-import ru.cristalix.uiengine.utility.ProxiedRotation
-import ru.cristalix.uiengine.utility.ProxiedV3
-import ru.cristalix.uiengine.utility.Rotation
-import ru.cristalix.uiengine.utility.V2
-import ru.cristalix.uiengine.utility.V3
-import ru.cristalix.uiengine.utility.alignMatrix
-import ru.cristalix.uiengine.utility.colorMatrix
-import ru.cristalix.uiengine.utility.get
-import ru.cristalix.uiengine.utility.matrixFields
-import ru.cristalix.uiengine.utility.offsetMatrix
-import ru.cristalix.uiengine.utility.originMatrix
-import ru.cristalix.uiengine.utility.rotate
-import ru.cristalix.uiengine.utility.rotationMatrix
-import ru.cristalix.uiengine.utility.scale
-import ru.cristalix.uiengine.utility.scaleMatrix
-import ru.cristalix.uiengine.utility.sizeMatrix
-import ru.cristalix.uiengine.utility.translate
 
 @Suppress("LeakingThis")
 abstract class AbstractElement() : IElement {
@@ -349,6 +327,7 @@ abstract class AbstractElement() : IElement {
                 matrix.setIdentity()
             }
 
+            val resolutionScale = Resolution.resolutionScale(lastParent)
             when (matrixId) {
                 alignMatrix -> matrix.translate(
                     properties[AlignX] * properties[ParentSizeX],
@@ -364,14 +343,14 @@ abstract class AbstractElement() : IElement {
                 )
 
                 offsetMatrix -> matrix.translate(
-                    properties[OffsetX],
-                    properties[OffsetY],
+                    properties[OffsetX] * resolutionScale,
+                    properties[OffsetY] * resolutionScale,
                     properties[OffsetZ]
                 )
 
-                scaleMatrix -> if (this !is Context2D) matrix.scale(
-                    properties[ScaleX],
-                    properties[ScaleY],
+                scaleMatrix -> matrix.scale(
+                    properties[ScaleX] * resolutionScale,
+                    properties[ScaleY] * resolutionScale,
                     properties[ScaleZ]
                 )
 
@@ -421,22 +400,11 @@ abstract class AbstractElement() : IElement {
         )
 
         val matrixBuffer = matrixBuffer
-        matrices.forEachIndexed { index, matrix ->
-            if (matrix == null) return@forEachIndexed
-
+        for (matrix in this.matrices) {
+            if (matrix == null) continue
             matrix.store(matrixBuffer)
             matrixBuffer.flip()
             GlStateManager.multMatrix(matrixBuffer)
-
-            if (index == scaleMatrix) {
-                lastParent?.run {
-                    if (this is Context2D) GlStateManager.scale(
-                        this.properties[ScaleX],
-                        this.properties[ScaleY],
-                        this.properties[ScaleZ],
-                    )
-                }
-            }
         }
     }
 
