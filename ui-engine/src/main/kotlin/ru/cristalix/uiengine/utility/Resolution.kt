@@ -53,7 +53,7 @@ object Resolution {
         val devAndPlayerProportion =
             (InitialHeightDouble + InitialWidthDouble) / (DevWidthDouble + DevHeightDouble)
         ScaleFactor =
-            ((widthScale + heightScale) / (2.0 * scale)) * McScaleDouble * devAndPlayerProportion
+            ((widthScale + heightScale) / (2.0 * scale)) * McScaleDouble /* devAndPlayerProportion*/
 
         overlayContext.updateResolution()
 //        postOverlayContext.updateResolution()
