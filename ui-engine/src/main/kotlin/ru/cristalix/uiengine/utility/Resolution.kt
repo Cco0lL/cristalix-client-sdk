@@ -2,12 +2,12 @@ package ru.cristalix.uiengine.utility
 
 import org.lwjgl.opengl.Display
 import ru.cristalix.uiengine.UIEngine
-import ru.cristalix.uiengine.UIEngine.overlayContext
 import ru.cristalix.uiengine.element.AbstractElement
 import ru.cristalix.uiengine.element.Context2D
-import ru.cristalix.uiengine.element.ContextGui
 
 object Resolution {
+
+    private val contexts = arrayListOf<Context2D>()
 
     var enabled = false
         private set
@@ -25,16 +25,9 @@ object Resolution {
     var ScaleFactor = 0.0
         private set
 
-    /**
-     * that's need for preserving the proportions of existing code, just set the value to 1.5
-     */
-    var McScaleDouble = 1.0
-        private set
-
-    fun initialize(devWidth: Int = 1920, devHeight: Int = 1280, mcScale: Double = 1.0) {
+    fun initialize(devWidth: Int = 1920, devHeight: Int = 1080) {
         DevWidthDouble = devWidth.toDouble()
         DevHeightDouble = devHeight.toDouble()
-        McScaleDouble = mcScale
         enabled = true
         updateResolution()
     }
@@ -53,25 +46,32 @@ object Resolution {
         val devAndPlayerProportion =
             (InitialHeightDouble + InitialWidthDouble) / (DevWidthDouble + DevHeightDouble)
         ScaleFactor =
-            ((widthScale + heightScale) / (2.0 * scale)) * McScaleDouble /* devAndPlayerProportion*/
+            ((widthScale + heightScale) / (2.0 * scale)) * devAndPlayerProportion
 
-        overlayContext.updateResolution()
-//        postOverlayContext.updateResolution()
-    }
-
-    fun resolutionScale(lastParent: AbstractElement?): Double {
-        var resolutionScale = 1.0
-        lastParent?.let {
-            if (enabled && (it is ContextGui || it == overlayContext)) resolutionScale = ScaleFactor
+        for (context in contexts) {
+            context.updateResolution()
         }
-        return resolutionScale
     }
-}
 
-fun Context2D.updateResolution() {
-    if (!Resolution.enabled) return
-    for (child in children) {
-        child.markDirty(scaleMatrix)
-        child.markDirty(offsetMatrix)
+    fun resolutionScale(parent: AbstractElement?) = parent?.let {
+        if (it is Context2D && contexts.contains(it)) ScaleFactor else 1.0
+    } ?: 1.0
+
+    fun Context2D.enableAutoResolution() {
+        if (!enabled) return
+        contexts += this
+        updateResolution()
+    }
+
+    fun Context2D.disableAutoResolution() {
+        if (!enabled) return
+        contexts -= this
+    }
+
+    private fun Context2D.updateResolution() {
+        for (child in children) {
+            child.markDirty(scaleMatrix)
+            child.markDirty(offsetMatrix)
+        }
     }
 }

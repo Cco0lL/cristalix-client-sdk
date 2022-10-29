@@ -5,8 +5,9 @@ import org.lwjgl.input.Keyboard
 import ru.cristalix.uiengine.ClickEvent
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.MouseButton
+import ru.cristalix.uiengine.utility.Resolution.disableAutoResolution
+import ru.cristalix.uiengine.utility.Resolution.enableAutoResolution
 import ru.cristalix.uiengine.utility.V3
-import ru.cristalix.uiengine.utility.updateResolution
 
 inline fun safe(action: () -> Unit) {
     try {
@@ -51,13 +52,12 @@ open class ContextGui(builder: Screen.Builder = Screen.Builder.builder()) : Cont
         .build()
 
     fun open() {
-        updateResolution()
-        UIEngine.currentContextGui = this
+        enableAutoResolution()
         UIEngine.clientApi.minecraft().displayScreen(screen)
     }
 
     fun close() {
-        UIEngine.currentContextGui = null
+        disableAutoResolution()
         UIEngine.clientApi.minecraft().displayScreen(null)
     }
 

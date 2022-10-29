@@ -15,7 +15,6 @@ import ru.cristalix.uiengine.eventloop.EventLoopImpl
 import ru.cristalix.uiengine.utility.MouseButton
 import ru.cristalix.uiengine.utility.Resolution
 import ru.cristalix.uiengine.utility.V3
-import ru.cristalix.uiengine.utility.updateResolution
 import java.nio.FloatBuffer
 import kotlin.properties.Delegates.notNull
 
@@ -108,7 +107,6 @@ object UIEngine : EventLoop by EventLoopImpl() {
         overlayContext.size = V3(resolution.scaledWidth_double, resolution.scaledHeight_double)
         postOverlayContext.size = V3(resolution.scaledWidth_double, resolution.scaledHeight_double)
         Resolution.updateResolution()
-        currentContextGui?.updateResolution()
     }
 
     private fun renderOverlay() {
