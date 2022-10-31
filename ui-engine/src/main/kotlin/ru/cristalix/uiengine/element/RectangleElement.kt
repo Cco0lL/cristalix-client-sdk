@@ -217,7 +217,7 @@ open class RectangleElement : AbstractElement(), Parent {
             depth++
         }
 
-        if (color.alpha > 0 || colorMask) {
+        if (color.alpha > 0 || mask) {
             val textureLocation = textureLocation
             if (textureLocation != null) {
                 api.renderEngine().bindTexture(textureLocation)
@@ -300,7 +300,7 @@ open class RectangleElement : AbstractElement(), Parent {
         if (childrenAmount > 0) {
             if (mask) {
                 GlStateManager.depthMask(false)
-                GlStateManager.depthFunc(GL11.GL_GEQUAL)
+                GlStateManager.depthFunc(GL11.GL_EQUAL)
             }
             val offset = 1.02f / (childrenAmount + 1)
             for (child in children) {
