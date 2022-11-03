@@ -40,6 +40,9 @@ open class RectangleElement : AbstractElement(), Parent {
     var mask: Boolean = false
 
     @JvmField
+    var colorMask: Boolean = true
+
+    @JvmField
     var layering: Boolean = false
 
     override val children: MutableList<AbstractElement> = ArrayList()
@@ -195,8 +198,10 @@ open class RectangleElement : AbstractElement(), Parent {
             GlStateManager.translate(0f, 0f, 0.97f)
         }
 
-
         val color = color
+        if (!colorMask) {
+            GlStateManager.colorMask(false, false, false, false)
+        }
 
         if (debug) {
             depth++
@@ -277,6 +282,10 @@ open class RectangleElement : AbstractElement(), Parent {
             tessellator.draw()
             GlStateManager.enableTexture2D()
             GlStateManager.disableBlend()
+        }
+
+        if (!colorMask) {
+            GlStateManager.colorMask(true, true, true, true)
         }
 
         if (childrenAmount > 0) {
