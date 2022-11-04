@@ -289,6 +289,7 @@ abstract class AbstractElement(): IElement {
                 matrix.setIdentity()
             }
 
+            val resolutionScale = Resolution.resolutionScale(lastParent)
             when (matrixId) {
                 alignMatrix -> matrix.translate(
                     properties[AlignX] * properties[ParentSizeX],
@@ -302,13 +303,13 @@ abstract class AbstractElement(): IElement {
                     properties[RotationZ]
                 )
                 offsetMatrix -> matrix.translate(
-                    properties[OffsetX],
-                    properties[OffsetY],
+                    properties[OffsetX] * resolutionScale,
+                    properties[OffsetY] * resolutionScale,
                     properties[OffsetZ]
                 )
                 scaleMatrix -> matrix.scale(
-                    properties[ScaleX],
-                    properties[ScaleY],
+                    properties[ScaleX] * resolutionScale,
+                    properties[ScaleY] * resolutionScale,
                     properties[ScaleZ]
                 )
                 originMatrix -> matrix.translate(

@@ -15,6 +15,7 @@ import ru.cristalix.uiengine.element.*
 import ru.cristalix.uiengine.eventloop.EventLoop
 import ru.cristalix.uiengine.eventloop.EventLoopImpl
 import ru.cristalix.uiengine.utility.MouseButton
+import ru.cristalix.uiengine.utility.Resolution
 import ru.cristalix.uiengine.utility.V3
 import java.nio.FloatBuffer
 
@@ -107,6 +108,7 @@ object UIEngine: EventLoop by EventLoopImpl() {
         val resolution = clientApi.resolution()
         overlayContext.size = V3(resolution.scaledWidth_double, resolution.scaledHeight_double)
         postOverlayContext.size = V3(resolution.scaledWidth_double, resolution.scaledHeight_double)
+        Resolution.updateResolution()
     }
 
     private fun renderOverlay() {
