@@ -2,14 +2,9 @@ package ru.cristalix.uiengine.element
 
 import dev.xdark.clientapi.gui.Screen
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
-import org.lwjgl.util.vector.Matrix4f
-import org.lwjgl.util.vector.Vector2f
 import ru.cristalix.uiengine.ClickEvent
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.MouseButton
-import ru.cristalix.uiengine.utility.Resolution.disableAutoResolution
-import ru.cristalix.uiengine.utility.Resolution.enableAutoResolution
 import ru.cristalix.uiengine.utility.V3
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -59,12 +54,10 @@ open class ContextGui(builder: Screen.Builder = Screen.Builder.builder()) : Cont
         .build()
 
     fun open() {
-        enableAutoResolution()
         UIEngine.clientApi.minecraft().displayScreen(screen)
     }
 
     fun close() {
-        disableAutoResolution()
         UIEngine.clientApi.minecraft().displayScreen(null)
     }
 
