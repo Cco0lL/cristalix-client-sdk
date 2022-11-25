@@ -4,6 +4,7 @@ import org.lwjgl.opengl.Display
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.AbstractElement
 import ru.cristalix.uiengine.element.Context2D
+import kotlin.math.min
 
 object Resolution {
 
@@ -43,10 +44,9 @@ object Resolution {
         val widthScale = mc.displayWidth / InitialWidthDouble
         val heightScale = mc.displayHeight / InitialHeightDouble
 
-        val devAndPlayerProportion =
-            (InitialHeightDouble + InitialWidthDouble) / (DevWidthDouble + DevHeightDouble)
-        ScaleFactor =
-            ((widthScale + heightScale) / (2.0 * scale)) * devAndPlayerProportion
+        val windowScale = min(widthScale, heightScale)
+        val devAndPlayerProportion = (InitialHeightDouble + InitialWidthDouble) / (DevWidthDouble + DevHeightDouble)
+        ScaleFactor = (windowScale / scale) * devAndPlayerProportion
 
         for (context in contexts) {
             context.updateResolution()
